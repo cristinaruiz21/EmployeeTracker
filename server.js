@@ -33,7 +33,8 @@ function start(){
               "View a department",
               "View a role",
               "View an employee",
-              "Update employee roles"
+              "Update employee roles",
+              "Delete Department"
             ]
         }
     ]).then(response => {
@@ -63,9 +64,13 @@ function start(){
           break;
     
         case "Update employee roles":
-          createEmployee();
+          updateEmployee();
           break;
-  
+        
+        case "Delete department":
+          deleteDepartment();
+          break;
+
         case "exit":
           connection.end();
           break;
@@ -82,7 +87,7 @@ function createDepartment() {
         },
     ]).then(function(response){
         connection.query(
-            "INSERT INTO department (department_name) VALUES (?)",
+            "INSERT INTO department SET ?",
             {
               department_name: response.departmentName
             },
@@ -114,7 +119,7 @@ function createRole() {
         },
     ]).then(function(response){
         connection.query(
-            "INSERT INTO role (title, salary, department_id) VALUES (?)",
+            "INSERT INTO role SET ?",
             {
               title: response.roleTitle,
               salary: response.salary,
@@ -154,7 +159,7 @@ function createEmployee() {
         },
     ]).then(function(response){
         connection.query(
-            "INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?)",
+            "INSERT INTO employee SET ?",
             {
               first_name: response.employeeFirstName,
               last_name: response.employeeLastName,
@@ -199,3 +204,100 @@ function viewEmployee(){
       start();
 });
 }
+
+function updateEmployee(){
+  connection.query("SELECT * FROM employee", function(err, results) {
+    if (err) throw err;
+    inquirer
+      .prompt([
+        {
+          name: "choice",
+          type: "list",
+          choices: function() {
+            var choiceArray = [];
+            for (var i = 0; i < results.length; i++) {
+              choiceArray.push(results[i].first_name);
+            }
+            return choiceArray;
+          },
+          message: "Which employee would you like to update?"
+        },
+        {
+          name: "id",
+          type: "input",
+          message: "What would you like the new role id to be?"
+        }
+      ])
+      .then(function(answer) {
+        // get the information of the chosen item
+        var chosenItem;
+        for (var i = 0; i < results.length; i++) {
+          if (results[i].first_name === answer.choice) {
+            chosenItem = results[i];
+          }
+        }
+          connection.query(
+            "UPDATE employee SET ? WHERE ?",
+            [
+              {
+                role_id: answer.id
+              },
+              {
+                id: chosenItem.id
+              }
+            ],
+            function(error) {
+              if (error) throw err;
+              console.log("Employee role id updated successfully!");
+              start();
+            }
+          );
+        })
+      }
+  )}
+  
+function deleteDepartment(){
+  connection.query("SELECT * FROM department", function(err, results) {
+    if (err) throw err;
+    inquirer
+      .prompt([
+        {
+          name: "choice",
+          type: "list",
+          choices: function() {
+            var choiceArray = [];
+            for (var i = 0; i < results.length; i++) {
+              choiceArray.push(results[i].department_name);
+            }
+            return choiceArray;
+          },
+          message: "Which department would you like to delete?"
+        },
+        // {
+        //   name: "id",
+        //   type: "input",
+        //   message: "What would you like the new role id to be?"
+        // }
+      ]).then(function(answer) {
+        // get the information of the chosen item
+        var chosenItem;
+        for (var i = 0; i < results.length; i++) {
+          if (results[i].department_name === answer.choice) {
+            chosenItem = results[i];
+          }
+        }
+          connection.query(
+            "DELETE FROM department WHERE id = ?",
+              {
+                id: chosenItem.id
+              },
+            function(error) {
+              if (error) throw err;
+              console.log("Department deleted successfully!");
+              start();
+            }
+          );
+        })
+      }
+  )}
+      
