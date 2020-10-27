@@ -23,21 +23,21 @@ connection.connect(function(err) {
 function start(){
     inquirer.prompt([
         {
-            type: "input",
+            type: "list",
             name: "startChoices",
             message: "What would you like to do?",
             choices: [
-                "Add a new department",
-                "Add a new role",
-                "Add a new employee",
-                "View a department",
-                "View a role",
-                "View an employee",
-                "Update employee roles"
+              "Add a new department",
+              "Add a new role",
+              "Add a new employee",
+              "View a department",
+              "View a role",
+              "View an employee",
+              "Update employee roles"
             ]
         }
-    ]).then(function(answer) {
-        switch (answer.action) {
+    ]).then(response => {
+        switch (response.startChoices) {
         case "Add a new department":
           createDepartment();
           break;
@@ -47,23 +47,23 @@ function start(){
           break;
   
         case "Add a new employee":
-          createEmployee;
+          createEmployee();
           break;
   
         case "View a department":
-          console.table(department);
+          viewDepartment();
           break;
 
         case "View a role":
-          console.table(role);
+          viewRole();
           break;
     
         case "View an employee":
-          console.table(employee);
+          viewEmployee();
           break;
     
         case "Update employee roles":
-          createEmployee;
+          createEmployee();
           break;
   
         case "exit":
@@ -80,11 +80,11 @@ function createDepartment() {
             name: "departmentName",
             message: "What is the department name?"
         },
-    ]).then(function(answer){
+    ]).then(function(response){
         connection.query(
-            "INSERT INTO department (department_name)",
+            "INSERT INTO department (department_name) VALUES (?)",
             {
-              department_name: answer.departmentName
+              department_name: response.departmentName
             },
             function(err) {
               if (err) throw err;
@@ -112,13 +112,13 @@ function createRole() {
             name: "departmentId",
             message: "What is the department id?"
         },
-    ]).then(function(answer){
+    ]).then(function(response){
         connection.query(
-            "INSERT INTO role (title, salary, department_id)",
+            "INSERT INTO role (title, salary, department_id) VALUES (?)",
             {
-              title: answer.roleTitle,
-              salary: answer.salary,
-              department_id: answer.departmentId || 0
+              title: response.roleTitle,
+              salary: response.salary,
+              department_id: response.departmentId || 0
             },
             function(err) {
               if (err) throw err;
@@ -152,14 +152,14 @@ function createEmployee() {
             name: "managerId",
             message: "What is the manager's id?"
         },
-    ]).then(function(answer){
+    ]).then(function(response){
         connection.query(
-            "INSERT INTO employee (first_name, last_name, role_id, manager_id",
+            "INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?)",
             {
-              first_name: answer.employeeFirstName,
-              last_name: answer.employeeLastName,
-              role_id: answer.roleId || 0,
-              manager_id: answer.managerId || 0
+              first_name: response.employeeFirstName,
+              last_name: response.employeeLastName,
+              role_id: response.roleId || 0,
+              manager_id: response.managerId || 0
             },
             function(err) {
               if (err) throw err;
@@ -170,5 +170,32 @@ function createEmployee() {
         })
 }
 
+function viewDepartment(){
+  connection.query(
+    "SELECT * FROM department",
+    function(err,res) {
+      if (err) throw err;
+      console.table(res);
+      start();
+});
+}
 
+function viewRole(){
+  connection.query(
+    "SELECT * FROM role",
+    function(err,res) {
+      if (err) throw err;
+      console.table(res);
+      start();
+});
+}
 
+function viewEmployee(){
+  connection.query(
+    "SELECT * FROM employee",
+    function(err,res) {
+      if (err) throw err;
+      console.table(res);
+      start();
+});
+}
