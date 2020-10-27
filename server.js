@@ -17,8 +17,61 @@ var connection = mysql.createConnection({
 
 connection.connect(function(err) {
   if (err) throw err;
-  createDepartment();
+  start();
 });
+
+function start(){
+    inquirer.prompt([
+        {
+            type: "input",
+            name: "startChoices",
+            message: "What would you like to do?",
+            choices: [
+                "Add a new department",
+                "Add a new role",
+                "Add a new employee",
+                "View a department",
+                "View a role",
+                "View an employee",
+                "Update employee roles"
+            ]
+        }
+    ]).then(function(answer) {
+        switch (answer.action) {
+        case "Add a new department":
+          createDepartment();
+          break;
+  
+        case "Add a new role":
+          createRole();
+          break;
+  
+        case "Add a new employee":
+          createEmployee;
+          break;
+  
+        case "View a department":
+          console.table(department);
+          break;
+
+        case "View a role":
+          console.table(role);
+          break;
+    
+        case "View an employee":
+          console.table(employee);
+          break;
+    
+        case "Update employee roles":
+          createEmployee;
+          break;
+  
+        case "exit":
+          connection.end();
+          break;
+        }
+      });
+}
 
 function createDepartment() {
     inquirer.prompt([
@@ -36,7 +89,7 @@ function createDepartment() {
             function(err) {
               if (err) throw err;
               console.log("Your department was added successfully!");
-              createRole();
+              start();
             }
           );
         })
@@ -70,7 +123,7 @@ function createRole() {
             function(err) {
               if (err) throw err;
               console.log("Your role was added successfully!");
-              createEmployee();
+              start();
             }
           );
         })
