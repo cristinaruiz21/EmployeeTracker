@@ -2,7 +2,7 @@
 # EmployeeTracker
 # Description: 
 
-    This program allows a company to view and manage its departments, roles, and employees.
+    This program allows a company to view and manage its departments, roles, and employees. This will aid in planning and organizing business's employee structure.
 
 # Table of Contents: 
 *[Installation](#installation)
@@ -17,11 +17,11 @@
 
 # Installation: 
 
-    Node.JS and npm install inquirer
+    Node.JS, npm install inquirer, and MySQL (npm install mysql)
 
 # Usage: 
 
-    Run "node server.js". You are prompted with a list of options including add department/role/employee, view department/role/employee, and update employee. Select an add option and fill in the information prompted to you. You may then view the newly added information. You can edit the employee's within each department.
+    Run "node server.js". You are prompted with a list of options including add department/role/employee, view department/role/employee, update employee, and delete department/role/employee. Go through all of the "add" options first to create your database. You may then view, delete, and/or update the newly added information. 
 
 # License: 
 

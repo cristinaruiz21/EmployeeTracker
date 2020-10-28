@@ -34,7 +34,9 @@ function start(){
               "View a role",
               "View an employee",
               "Update employee roles",
-              "Delete Department"
+              "Delete department",
+              "Delete role",
+              "Delete employee"
             ]
         }
     ]).then(response => {
@@ -69,6 +71,14 @@ function start(){
         
         case "Delete department":
           deleteDepartment();
+          break;
+        
+        case "Delete role":
+          deleteRole();
+          break;
+
+        case "Delete employee":
+          deleteEmployee();
           break;
 
         case "exit":
@@ -272,12 +282,7 @@ function deleteDepartment(){
             return choiceArray;
           },
           message: "Which department would you like to delete?"
-        },
-        // {
-        //   name: "id",
-        //   type: "input",
-        //   message: "What would you like the new role id to be?"
-        // }
+        }
       ]).then(function(answer) {
         // get the information of the chosen item
         var chosenItem;
@@ -291,13 +296,53 @@ function deleteDepartment(){
               {
                 id: chosenItem.id
               },
-            function(error) {
-              if (error) throw err;
-              console.log("Department deleted successfully!");
-              start();
-            }
+              function(err, res) {
+                if (err) throw err;
+                console.log("Department successfully deleted!");
+                start();
+              }
           );
         })
       }
   )}
+
+  function deleteRole(){
+    connection.query("SELECT * FROM role", function(err, results) {
+      if (err) throw err;
+      inquirer
+        .prompt([
+          {
+            name: "choice",
+            type: "list",
+            choices: function() {
+              var choiceArray = [];
+              for (var i = 0; i < results.length; i++) {
+                choiceArray.push(results[i].title);
+              }
+              return choiceArray;
+            },
+            message: "Which role would you like to delete?"
+          }
+        ]).then(function(answer) {
+          // get the information of the chosen item
+          var chosenItem;
+          for (var i = 0; i < results.length; i++) {
+            if (results[i].title === answer.choice) {
+              chosenItem = results[i];
+            }
+          }
+            connection.query(
+              "DELETE FROM role WHERE id = ?",
+                {
+                  id: chosenItem.id
+                },
+                function(err, res) {
+                  if (err) throw err;
+                  console.log("Role successfully deleted!");
+                  start();
+                }
+            );
+          })
+        }
+    )}
       
