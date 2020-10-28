@@ -345,4 +345,45 @@ function deleteDepartment(){
           })
         }
     )}
+
+    function deleteEmployee(){
+      connection.query("SELECT * FROM employee", function(err, results) {
+        if (err) throw err;
+        inquirer
+          .prompt([
+            {
+              name: "choice",
+              type: "list",
+              choices: function() {
+                var choiceArray = [];
+                for (var i = 0; i < results.length; i++) {
+                  choiceArray.push(results[i].first_name);
+                }
+                return choiceArray;
+              },
+              message: "Which employee would you like to delete?"
+            }
+          ]).then(function(answer) {
+            // get the information of the chosen item
+            var chosenItem;
+            for (var i = 0; i < results.length; i++) {
+              if (results[i].first_name === answer.choice) {
+                chosenItem = results[i];
+              }
+            }
+              connection.query(
+                "DELETE FROM employee WHERE id = ?",
+                  {
+                    id: chosenItem.id
+                  },
+                  function(err, res) {
+                    if (err) throw err;
+                    console.log("Employee successfully deleted!");
+                    start();
+                  }
+              );
+            })
+          }
+      )}
+        
       
